@@ -14,13 +14,15 @@ func main() {
 	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
 	for j := ny - 1; j >= 0; j-- {
 		for i := 0; i < nx; i++ {
-			r := float64(i) / float64(nx)
-			g := float64(j) / float64(ny)
-			b := 0.2
+			vec := Vector{
+				float64(i) / float64(nx),
+				float64(j) / float64(ny),
+				0.2,
+			}
 
-			ir := uint8(255.99 * r)
-			ig := uint8(255.99 * g)
-			ib := uint8(255.99 * b)
+			ir := uint8(255.99 * vec.R())
+			ig := uint8(255.99 * vec.G())
+			ib := uint8(255.99 * vec.B())
 
 			img.Set(i, ny-j, color.RGBA{ir, ig, ib, 255})
 		}
