@@ -12,7 +12,7 @@ func main() {
 	ny := 100
 
 	origin := Vector{0.0, 0.0, 0.0}
-	lowerLeft := Vector{-2.0, -2.0, -1.0}
+	lowerLeft := Vector{-2.0, -1.0, -1.0}
 	horizontal := Vector{4.0, 0.0, 0.0}
 	vertical := Vector{0.0, 2.0, 0.0}
 
@@ -23,7 +23,7 @@ func main() {
 			v := float64(j) / float64(ny)
 			r := Ray{origin, lowerLeft.Add(horizontal.Scale(u).Add(vertical.Scale(v)))}
 
-			c := backgroundColor(r)
+			c := computeColor(r)
 			ir := uint8(255.99 * c.R())
 			ig := uint8(255.99 * c.G())
 			ib := uint8(255.99 * c.B())
@@ -36,7 +36,11 @@ func main() {
 	must(png.Encode(file, img))
 }
 
-func backgroundColor(r Ray) Vector {
+func computeColor(r Ray) Vector {
+	if HitSphere(Vector{0.0, 0.0, -1.0}, 0.5, r) {
+		return Vector{1.0, 0.0, 0.0}
+	}
+
 	unitDirection := Unit(r.Direction())
 	t := 0.5 * (unitDirection.Y() + 1.0)
 	v1 := Vector{1.0, 1.0, 1.0}.Scale(1.0 - t)

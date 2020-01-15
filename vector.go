@@ -89,7 +89,7 @@ func (v Vector) Scale(t float64) Vector {
 	}
 }
 
-func (v Vector) Dot(v2 Vector) float64 {
+func Dot(v, v2 Vector) float64 {
 	return v.e0*v2.e0 + v.e1*v2.e1 + v.e2*v2.e2
 }
 
