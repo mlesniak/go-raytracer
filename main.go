@@ -40,12 +40,18 @@ func main() {
 
 func computeColor(r Ray) Vector {
 	sphere := Sphere{Vector{0.0, 0.0, -1.0}, 0.5}
-	if sphere.Hit(r) {
-		return Vector{1.0, 0.0, 0.0}
+	t := sphere.Hit(r)
+	if t > 0.0 {
+		n := Unit(r.At(t).Sub(Vector{0.0, 0.0, -1.0}))
+		return Vector{
+			n.X() + 1.0,
+			n.Y() + 1.0,
+			n.Z() + 1.0,
+		}.Scale(0.5)
 	}
 
 	unitDirection := Unit(r.Direction())
-	t := 0.5 * (unitDirection.Y() + 1.0)
+	t = 0.5 * (unitDirection.Y() + 1.0)
 	v1 := Vector{1.0, 1.0, 1.0}.Scale(1.0 - t)
 	v2 := Vector{0.5, 0.7, 1.0}.Scale(t)
 	return v1.Add(v2)
