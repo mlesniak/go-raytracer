@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/png"
@@ -10,6 +11,7 @@ import (
 func main() {
 	nx := 200
 	ny := 100
+	fmt.Printf("Computing %d pixel\n", nx*ny)
 
 	origin := Vector{0.0, 0.0, 0.0}
 	lowerLeft := Vector{-2.0, -1.0, -1.0}
@@ -37,7 +39,8 @@ func main() {
 }
 
 func computeColor(r Ray) Vector {
-	if HitSphere(Vector{0.0, 0.0, -1.0}, 0.5, r) {
+	sphere := Sphere{Vector{0.0, 0.0, -1.0}, 0.5}
+	if sphere.Hit(r) {
 		return Vector{1.0, 0.0, 0.0}
 	}
 
