@@ -22,7 +22,7 @@ func main() {
 	world := World{}
 	world.Add(Sphere{
 		Vector{0, -1000.0, 0}, 1000,
-		Lambertian{Albedo: Vector{0.5, 0.5, 0.5}}})
+		Lambertian{Albedo: Vector{0.1, 0.1, 0.1}}})
 	//world.Add(Sphere{
 	//	Vector{0, 0, -1}, 0.5,
 	//	Lambertian{Albedo: Vector{0.1, 0.2, 0.5}}})
