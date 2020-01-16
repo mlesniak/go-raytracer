@@ -50,7 +50,7 @@ func main() {
 }
 
 func pixel(w World, r Ray) Vector {
-	rec, hit := w.Hit(r, 0.0, math.MaxFloat64)
+	rec, hit := w.Hit(r, 0.001, math.MaxFloat64)
 	if hit {
 		target := rec.P.Add(rec.Normal).Add(RandomInUnitSphere())
 		return pixel(w, Ray{rec.P, target.Sub(rec.P)}).Scale(0.5)
