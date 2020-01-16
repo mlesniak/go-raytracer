@@ -31,14 +31,14 @@ func main() {
 		Vector{-1, 0, -1}, 0.5,
 		Dielectric{1.5}})
 	world.Add(Sphere{
-		Vector{-1, 0, -1}, -0.45,
+		Vector{-1, 0, -1}, -0.49,
 		Dielectric{1.5}})
 
 	cam := NewCamera(
 		Vector{-2, 2, 1},
 		Vector{0, 0, -1},
 		Vector{0, 1, 0},
-		90, float64(nx)/float64(ny))
+		50, float64(nx)/float64(ny))
 
 	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
 	for j := ny - 1; j >= 0; j -= step {
