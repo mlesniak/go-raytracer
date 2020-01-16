@@ -98,7 +98,7 @@ func Dot(v, v2 Vector) float64 {
 func (v Vector) Cross(v2 Vector) Vector {
 	return Vector{
 		e0: v.e1*v2.e2 - v.e2*v2.e1,
-		e1: v.e0*v2.e2 - v.e2*v2.e0,
+		e1: v.e2*v2.e0 - v.e0*v2.e2,
 		e2: v.e0*v2.e1 - v.e1*v2.e0,
 	}
 }
