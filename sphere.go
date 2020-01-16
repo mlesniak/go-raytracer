@@ -10,9 +10,9 @@ type Sphere struct {
 func (s Sphere) Hit(r Ray, tMin, tMax float64) (Hit, bool) {
 	oc := r.Origin().Sub(s.Center)
 	a := Dot(r.Direction(), r.Direction())
-	b := 2.0 * Dot(oc, r.Direction())
+	b := Dot(oc, r.Direction())
 	c := Dot(oc, oc) - s.Radius*s.Radius
-	discriminant := b*b - 4*a*c
+	discriminant := b*b - a*c
 
 	var rec Hit
 	if discriminant > 0 {
@@ -20,7 +20,7 @@ func (s Sphere) Hit(r Ray, tMin, tMax float64) (Hit, bool) {
 		if tmp < tMax && tmp > tMin {
 			rec.T = tmp
 			rec.P = r.At(rec.T)
-			rec.Normal = rec.P.Sub(s.Center).Scale(1 / s.Radius)
+			rec.Normal = rec.P.Sub(s.Center).Scale(1.0 / s.Radius)
 			return rec, true
 		}
 
@@ -28,7 +28,7 @@ func (s Sphere) Hit(r Ray, tMin, tMax float64) (Hit, bool) {
 		if tmp < tMax && tmp > tMin {
 			rec.T = tmp
 			rec.P = r.At(rec.T)
-			rec.Normal = rec.P.Sub(s.Center).Scale(1 / s.Radius)
+			rec.Normal = rec.P.Sub(s.Center).Scale(1.0 / s.Radius)
 			return rec, true
 		}
 	}
