@@ -19,11 +19,11 @@ func main() {
 
 	world := World{}
 	world.Add(Sphere{
+		Vector{0, -1000.5, 0}, 1000,
+		Lambertian{Albedo: Vector{0.5, 0.5, 0.5}}})
+	world.Add(Sphere{
 		Vector{0, 0, -1}, 0.5,
 		Lambertian{Albedo: Vector{0.1, 0.2, 0.5}}})
-	world.Add(Sphere{
-		Vector{0, -100.5, -1}, 100,
-		Lambertian{Albedo: Vector{0.8, 0.8, 0.0}}})
 	world.Add(Sphere{
 		Vector{1, 0, -1}, 0.5,
 		Metal{Albedo: Vector{0.8, 0.6, 0.2}, Fuzziness: 0.5}})
@@ -34,7 +34,7 @@ func main() {
 		Vector{-1, 0, -1}, -0.45,
 		Dielectric{1.5}})
 
-	lookFrom := Vector{3, 3, 2}
+	lookFrom := Vector{3, 1, 2}
 	lookAt := Vector{0, 0, -1}
 	distToFocus := lookFrom.Sub(lookAt).Len()
 	aperture := 2.0
@@ -42,7 +42,7 @@ func main() {
 		lookFrom,
 		lookAt,
 		Up(),
-		20, float64(nx)/float64(ny),
+		40, float64(nx)/float64(ny),
 		aperture, distToFocus)
 
 	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
