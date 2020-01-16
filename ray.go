@@ -16,3 +16,13 @@ func (r *Ray) Direction() Vector {
 func (r *Ray) At(t float64) Vector {
 	return r.a.Add(r.b.Scale(t))
 }
+
+type Hit struct {
+	T      float64
+	P      Vector
+	Normal Vector
+}
+
+type Hiter interface {
+	Hit(r Ray, tMin, tMax float64) (data Hit, hit bool)
+}
