@@ -11,8 +11,8 @@ import (
 )
 
 func main() {
-	nx := 400
-	ny := 200
+	nx := 200
+	ny := 100
 	ns := 100
 	step := 1
 	fmt.Printf("Computing %d pixel with aliasing=%d; == %dM pixels\n", (nx*ny)/step, ns, (nx*ny)/step*ns/1_000_000)
@@ -31,14 +31,19 @@ func main() {
 		Vector{-1, 0, -1}, 0.5,
 		Dielectric{1.5}})
 	world.Add(Sphere{
-		Vector{-1, 0, -1}, -0.49,
+		Vector{-1, 0, -1}, -0.45,
 		Dielectric{1.5}})
 
+	lookFrom := Vector{3, 3, 2}
+	lookAt := Vector{0, 0, -1}
+	distToFocus := lookFrom.Sub(lookAt).Len()
+	aperture := 2.0
 	cam := NewCamera(
-		Vector{-2, 2, 1},
-		Vector{0, 0, -1},
-		Vector{0, 1, 0},
-		50, float64(nx)/float64(ny))
+		lookFrom,
+		lookAt,
+		Up(),
+		20, float64(nx)/float64(ny),
+		aperture, distToFocus)
 
 	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
 	for j := ny - 1; j >= 0; j -= step {
