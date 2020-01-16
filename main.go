@@ -6,34 +6,38 @@ import (
 	"image/color"
 	"image/png"
 	"math"
+	"math/rand"
 	"os"
 )
 
 func main() {
 	nx := 200
 	ny := 100
+	ns := 100
 	fmt.Printf("Computing %d pixel\n", nx*ny)
-
-	origin := Vector{0.0, 0.0, 0.0}
-	lowerLeft := Vector{-2.0, -1.0, -1.0}
-	horizontal := Vector{4.0, 0.0, 0.0}
-	vertical := Vector{0.0, 2.0, 0.0}
 
 	world := World{}
 	world.Add(Sphere{Vector{0, 0, -1}, 0.5})
 	world.Add(Sphere{Vector{0, -100.5, -1}, 100})
 
+	cam := NewCamera()
+
 	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
 	for j := ny - 1; j >= 0; j-- {
 		for i := 0; i < nx; i++ {
-			u := float64(i) / float64(nx)
-			v := float64(j) / float64(ny)
-			r := Ray{origin, lowerLeft.Add(horizontal.Scale(u).Add(vertical.Scale(v)))}
+			var col Vector
+			// Antialiasing. For each pixel, shoot <ns> random rays and average the color based on the hit.
+			for s := 0; s < ns; s++ {
+				u := (float64(i) + rand.Float64()) / float64(nx)
+				v := (float64(j) + rand.Float64()) / float64(ny)
+				r := cam.ray(u, v)
+				col = col.Add(pixel(world, r))
+			}
+			col = col.Scale(1.0 / float64(ns))
 
-			c := pixel(world, r)
-			ir := uint8(255.99 * c.R())
-			ig := uint8(255.99 * c.G())
-			ib := uint8(255.99 * c.B())
+			ir := uint8(255.99 * col.R())
+			ig := uint8(255.99 * col.G())
+			ib := uint8(255.99 * col.B())
 
 			img.Set(i, ny-j, color.RGBA{ir, ig, ib, 255})
 		}
