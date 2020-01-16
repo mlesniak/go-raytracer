@@ -83,7 +83,7 @@ func (d Dielectric) Scatter(r Ray, rec Hit) (scatter Ray, attenuation Vector, re
 		cosine = -Dot(r.Direction(), rec.Normal) / r.Direction().Len()
 	}
 
-	attenuation = Vector{1.0, 1.0, 0.0}
+	attenuation = Vector{1.0, 1.0, 1.0}
 	refracted, ok := Refract(r.Direction(), outwardNormal, ratio)
 	if ok {
 		reflectProb = Schlick(cosine, d.refractionIndex)

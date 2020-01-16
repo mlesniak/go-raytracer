@@ -13,7 +13,7 @@ import (
 func main() {
 	nx := 400
 	ny := 200
-	ns := 10
+	ns := 100
 	step := 1
 	fmt.Printf("Computing %d pixel with aliasing=%d; == %dM pixels\n", (nx*ny)/step, ns, (nx*ny)/step*ns/1_000_000)
 

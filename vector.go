@@ -42,11 +42,13 @@ func Unit(v Vector) Vector {
 	return v.Scale(1 / v.Len())
 }
 
-func (v Vector) Unit() {
+func (v Vector) Unit() Vector {
 	k := v.Len()
-	v.e0 *= k
-	v.e1 *= k
-	v.e2 *= k
+	return Vector{
+		e0: v.e0 * 1.0 / k,
+		e1: v.e1 * 1.0 / k,
+		e2: v.e2 * 1.0 / k,
+	}
 }
 
 func (v Vector) Add(v2 Vector) Vector {
