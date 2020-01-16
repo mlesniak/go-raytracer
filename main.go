@@ -11,10 +11,11 @@ import (
 )
 
 func main() {
-	nx := 200
-	ny := 100
+	nx := 400
+	ny := 200
 	ns := 100
-	fmt.Printf("Computing %d pixel\n", nx*ny)
+	step := 1
+	fmt.Printf("Computing %d pixel with aliasing=%d\n", (nx*ny)/step, ns)
 
 	world := World{}
 	world.Add(Sphere{Vector{0, 0, -1}, 0.5})
@@ -23,8 +24,8 @@ func main() {
 	cam := NewCamera()
 
 	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
-	for j := ny - 1; j >= 0; j-- {
-		for i := 0; i < nx; i++ {
+	for j := ny - 1; j >= 0; j -= step {
+		for i := 0; i < nx; i += step {
 			var col Vector
 			// Antialiasing. For each pixel, shoot <ns> random rays and average the color based on the hit.
 			for s := 0; s < ns; s++ {
@@ -50,11 +51,8 @@ func main() {
 func pixel(w World, r Ray) Vector {
 	rec, hit := w.Hit(r, 0.0, math.MaxFloat64)
 	if hit {
-		return Vector{
-			rec.Normal.X() + 1.0,
-			rec.Normal.Y() + 1.0,
-			rec.Normal.Z() + 1.0,
-		}.Scale(0.5)
+		target := rec.P.Add(rec.Normal).Add(RandomInUnitSphere())
+		return pixel(w, Ray{rec.P, target.Sub(rec.P)}).Scale(0.5)
 	}
 
 	unitDirection := Unit(r.Direction())
