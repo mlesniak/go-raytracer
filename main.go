@@ -19,6 +19,10 @@ func main() {
 	horizontal := Vector{4.0, 0.0, 0.0}
 	vertical := Vector{0.0, 2.0, 0.0}
 
+	world := World{}
+	world.Add(Sphere{Vector{0, 0, -1}, 0.5})
+	world.Add(Sphere{Vector{0, -100.5, -1}, 100})
+
 	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
 	for j := ny - 1; j >= 0; j-- {
 		for i := 0; i < nx; i++ {
@@ -26,7 +30,7 @@ func main() {
 			v := float64(j) / float64(ny)
 			r := Ray{origin, lowerLeft.Add(horizontal.Scale(u).Add(vertical.Scale(v)))}
 
-			c := computeColor(r)
+			c := pixel(world, r)
 			ir := uint8(255.99 * c.R())
 			ig := uint8(255.99 * c.G())
 			ib := uint8(255.99 * c.B())
@@ -39,9 +43,8 @@ func main() {
 	must(png.Encode(file, img))
 }
 
-func computeColor(r Ray) Vector {
-	sphere := Sphere{Vector{0.0, 0.0, -1.0}, 0.5}
-	rec, hit := sphere.Hit(r, 0, math.MaxFloat64)
+func pixel(w World, r Ray) Vector {
+	rec, hit := w.Hit(r, 0.0, math.MaxFloat64)
 	if hit {
 		return Vector{
 			rec.Normal.X() + 1.0,
