@@ -15,13 +15,21 @@ func main() {
 	ny := 200
 	ns := 100
 	step := 1
-	fmt.Printf("Computing %d pixel with aliasing=%d\n", (nx*ny)/step, ns)
+	fmt.Printf("Computing %d pixel with aliasing=%d; == %dM pixels\n", (nx*ny)/step, ns, (nx*ny)/step*ns/1_000_000)
 
 	world := World{}
-	world.Add(Sphere{Vector{0, 0, -1}, 0.5, Lambertian{Albedo: Vector{0.8, 0.3, 0.3}}})
-	world.Add(Sphere{Vector{0, -100.5, -1}, 100, Lambertian{Albedo: Vector{0.8, 0.8, 0.0}}})
-	world.Add(Sphere{Vector{1, 0, -1}, 0.5, Metal{Albedo: Vector{0.8, 0.6, 0.2}, Fuzziness: 1.0}})
-	world.Add(Sphere{Vector{-1, 0, -1}, 0.5, Metal{Albedo: Vector{0.8, 0.8, 0.8}, Fuzziness: 0.3}})
+	world.Add(Sphere{
+		Vector{0, 0, -1}, 0.5,
+		Lambertian{Albedo: Vector{0.1, 0.2, 0.5}}})
+	world.Add(Sphere{
+		Vector{0, -100.5, -1}, 100,
+		Lambertian{Albedo: Vector{0.8, 0.8, 0.0}}})
+	world.Add(Sphere{
+		Vector{1, 0, -1}, 0.5,
+		Metal{Albedo: Vector{0.8, 0.6, 0.2}, Fuzziness: 0.0}})
+	world.Add(Sphere{
+		Vector{-1, 0, -1}, .5,
+		Dielectric{1.5}})
 
 	cam := NewCamera()
 
@@ -54,11 +62,9 @@ func main() {
 func pixel(w World, r Ray, depth int) Vector {
 	rec, hit := w.Hit(r, 0.001, math.MaxFloat64)
 	if hit {
-		if depth < 50 {
-			scatter, attenuation, reflection := rec.Material.Scatter(r, rec)
-			if reflection {
-				return attenuation.Mul(pixel(w, scatter, depth+1))
-			}
+		scatter, attenuation, reflection := rec.Material.Scatter(r, rec)
+		if depth < 50 && reflection {
+			return attenuation.Mul(pixel(w, scatter, depth+1))
 		} else {
 			return Vector{0, 0, 0}
 		}
