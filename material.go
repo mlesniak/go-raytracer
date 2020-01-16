@@ -68,32 +68,27 @@ type Dielectric struct {
 
 func (d Dielectric) Scatter(r Ray, rec Hit) (scatter Ray, attenuation Vector, reflected bool) {
 	var outwardNormal Vector
-	var niOverNt float64
+	var ratio float64
 
 	var reflectProb float64
 	var cosine float64
 
 	if Dot(r.Direction(), rec.Normal) > 0 {
 		outwardNormal = rec.Normal.Scale(-1.0)
-		niOverNt = d.refractionIndex
+		ratio = d.refractionIndex
 		cosine = d.refractionIndex * Dot(r.Direction(), rec.Normal) / r.Direction().Len()
 	} else {
 		outwardNormal = rec.Normal
-		niOverNt = 1.0 / d.refractionIndex
+		ratio = 1.0 / d.refractionIndex
 		cosine = -Dot(r.Direction(), rec.Normal) / r.Direction().Len()
 	}
 
 	attenuation = Vector{1.0, 1.0, 0.0}
-	refracted, ok := Refract(r.Direction(), outwardNormal, niOverNt)
+	refracted, ok := Refract(r.Direction(), outwardNormal, ratio)
 	if ok {
 		reflectProb = Schlick(cosine, d.refractionIndex)
-		//scatter = Ray{rec.P, refracted}
-		//return scatter, attenuation, true
 	} else {
 		reflectProb = 1.0
-		//refl := Reflect(r.Direction(), rec.Normal)
-		//scatter = Ray{rec.P, refl}
-		//return scatter, attenuation, false
 	}
 
 	if rand.Float64() < reflectProb {
