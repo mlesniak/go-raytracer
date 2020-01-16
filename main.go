@@ -28,7 +28,10 @@ func main() {
 		Vector{1, 0, -1}, 0.5,
 		Metal{Albedo: Vector{0.8, 0.6, 0.2}, Fuzziness: 0.0}})
 	world.Add(Sphere{
-		Vector{-1, 0, -1}, .5,
+		Vector{-1, 0, -1}, 0.5,
+		Dielectric{1.5}})
+	world.Add(Sphere{
+		Vector{-1, 0, -1}, -0.45,
 		Dielectric{1.5}})
 
 	cam := NewCamera()
