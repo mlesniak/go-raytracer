@@ -35,6 +35,7 @@ func main() {
 				col = col.Add(pixel(world, r))
 			}
 			col = col.Scale(1.0 / float64(ns))
+			col = Vector{math.Sqrt(col.R()), math.Sqrt(col.G()), math.Sqrt(col.B())}
 
 			ir := uint8(255.99 * col.R())
 			ig := uint8(255.99 * col.G())
