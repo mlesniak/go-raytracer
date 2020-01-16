@@ -5,6 +5,8 @@ import "math"
 type Sphere struct {
 	Center Vector
 	Radius float64
+	// Should we use pointer here?
+	Material Material
 }
 
 func (s Sphere) Hit(r Ray, tMin, tMax float64) (Hit, bool) {
@@ -21,6 +23,7 @@ func (s Sphere) Hit(r Ray, tMin, tMax float64) (Hit, bool) {
 			rec.T = tmp
 			rec.P = r.At(rec.T)
 			rec.Normal = rec.P.Sub(s.Center).Scale(1.0 / s.Radius)
+			rec.Material = s.Material
 			return rec, true
 		}
 
@@ -29,6 +32,7 @@ func (s Sphere) Hit(r Ray, tMin, tMax float64) (Hit, bool) {
 			rec.T = tmp
 			rec.P = r.At(rec.T)
 			rec.Normal = rec.P.Sub(s.Center).Scale(1.0 / s.Radius)
+			rec.Material = s.Material
 			return rec, true
 		}
 	}

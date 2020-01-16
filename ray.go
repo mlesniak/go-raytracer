@@ -20,9 +20,10 @@ func (r *Ray) At(t float64) Vector {
 }
 
 type Hit struct {
-	T      float64
-	P      Vector
-	Normal Vector
+	T        float64
+	P        Vector
+	Normal   Vector
+	Material Material
 }
 
 type Hiter interface {

@@ -18,8 +18,8 @@ func main() {
 	fmt.Printf("Computing %d pixel with aliasing=%d\n", (nx*ny)/step, ns)
 
 	world := World{}
-	world.Add(Sphere{Vector{0, 0, -1}, 0.5})
-	world.Add(Sphere{Vector{0, -100.5, -1}, 100})
+	world.Add(Sphere{Vector{0, 0, -1}, 0.5, Lambertian{Albedo: Vector{0.8, 0.3, 0.3}}})
+	world.Add(Sphere{Vector{0, -100.5, -1}, 100, Lambertian{Albedo: Vector{0.8, 0.8, 0.0}}})
 
 	cam := NewCamera()
 
@@ -32,7 +32,7 @@ func main() {
 				u := (float64(i) + rand.Float64()) / float64(nx)
 				v := (float64(j) + rand.Float64()) / float64(ny)
 				r := cam.ray(u, v)
-				col = col.Add(pixel(world, r))
+				col = col.Add(pixel(world, r, 0))
 			}
 			col = col.Scale(1.0 / float64(ns))
 			col = Vector{math.Sqrt(col.R()), math.Sqrt(col.G()), math.Sqrt(col.B())}
@@ -49,11 +49,17 @@ func main() {
 	must(png.Encode(file, img))
 }
 
-func pixel(w World, r Ray) Vector {
+func pixel(w World, r Ray, depth int) Vector {
 	rec, hit := w.Hit(r, 0.001, math.MaxFloat64)
 	if hit {
-		target := rec.P.Add(rec.Normal).Add(RandomInUnitSphere())
-		return pixel(w, Ray{rec.P, target.Sub(rec.P)}).Scale(0.5)
+		if depth < 50 {
+			scatter, attenuation, reflection := rec.Material.Scatter(r, rec)
+			if reflection {
+				return attenuation.Mul(pixel(w, scatter, depth+1))
+			}
+		} else {
+			return Vector{0, 0, 0}
+		}
 	}
 
 	unitDirection := Unit(r.Direction())
