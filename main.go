@@ -26,7 +26,7 @@ func main() {
 		Lambertian{Albedo: Vector{0.8, 0.8, 0.0}}})
 	world.Add(Sphere{
 		Vector{1, 0, -1}, 0.5,
-		Metal{Albedo: Vector{0.8, 0.6, 0.2}, Fuzziness: 0.0}})
+		Metal{Albedo: Vector{0.8, 0.6, 0.2}, Fuzziness: 0.5}})
 	world.Add(Sphere{
 		Vector{-1, 0, -1}, 0.5,
 		Dielectric{1.5}})
@@ -34,7 +34,7 @@ func main() {
 		Vector{-1, 0, -1}, -0.45,
 		Dielectric{1.5}})
 
-	cam := NewCamera()
+	cam := NewCamera(75, float64(nx)/float64(ny))
 
 	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
 	for j := ny - 1; j >= 0; j -= step {
