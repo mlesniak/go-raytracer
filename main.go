@@ -20,8 +20,8 @@ func main() {
 	world := World{}
 	world.Add(Sphere{Vector{0, 0, -1}, 0.5, Lambertian{Albedo: Vector{0.8, 0.3, 0.3}}})
 	world.Add(Sphere{Vector{0, -100.5, -1}, 100, Lambertian{Albedo: Vector{0.8, 0.8, 0.0}}})
-	world.Add(Sphere{Vector{1, 0, -1}, 0.5, Metal{Albedo: Vector{0.8, 0.6, 0.2}}})
-	world.Add(Sphere{Vector{-1, 0, -1}, 0.5, Metal{Albedo: Vector{0.8, 0.8, 0.8}}})
+	world.Add(Sphere{Vector{1, 0, -1}, 0.5, Metal{Albedo: Vector{0.8, 0.6, 0.2}, Fuzziness: 1.0}})
+	world.Add(Sphere{Vector{-1, 0, -1}, 0.5, Metal{Albedo: Vector{0.8, 0.8, 0.8}, Fuzziness: 0.3}})
 
 	cam := NewCamera()
 

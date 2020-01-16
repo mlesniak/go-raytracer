@@ -16,12 +16,18 @@ func (l Lambertian) Scatter(r Ray, rec Hit) (scatter Ray, attenuation Vector, re
 }
 
 type Metal struct {
-	Albedo Vector
+	Albedo    Vector
+	Fuzziness float64
 }
 
 func (m Metal) Scatter(r Ray, rec Hit) (scatter Ray, attenuation Vector, reflected bool) {
 	ref := Reflect(Unit(r.Direction()), rec.Normal)
 	scatter = Ray{rec.P, ref}
+	fuzz := 1.0
+	if m.Fuzziness < 1.0 {
+		fuzz = m.Fuzziness
+	}
+	scatter = Ray{rec.P, ref.Add(RandomInUnitSphere().Scale(fuzz))}
 	attenuation = m.Albedo
 	return scatter, attenuation, Dot(scatter.Direction(), rec.Normal) > 0
 }
