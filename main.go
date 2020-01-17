@@ -16,7 +16,7 @@ func main() {
 
 	nx := 200
 	ny := 100
-	ns := 10
+	ns := 1
 	step := 1
 
 	rand.Seed(time.Now().UnixNano())
@@ -72,9 +72,26 @@ func main() {
 		40, float64(nx)/float64(ny),
 		aperture, distToFocus)
 
+	img := computeImage(nx, ny, step, ns, cam, world)
+	file, err := os.Create("demo.png")
+	must(err)
+	must(png.Encode(file, img))
+
+	duration := time.Now().Sub(start)
+	fmt.Printf("Rendering took %10.4gs\n", duration.Seconds())
+}
+
+type result struct {
+	row  int
+	data []color.RGBA
+}
+
+func computeImage(nx int, ny int, step int, ns int, cam Camera, world World) *image.RGBA {
+	results := make(chan result, ny)
+
 	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
 	for j := ny - 1; j >= 0; j -= step {
-		//row := make([]color.RGBA, nx)
+		row := make([]color.RGBA, nx)
 		for i := 0; i < nx; i += step {
 			var col Vector
 			// Antialiasing. For each pixel, shoot <ns> random rays and average the color based on the hit.
@@ -90,16 +107,23 @@ func main() {
 			ir := uint8(255.99 * col.R())
 			ig := uint8(255.99 * col.G())
 			ib := uint8(255.99 * col.B())
+			row[i] = color.RGBA{ir, ig, ib, 255}
+		}
+		results <- result{j, row}
+	}
+	close(results)
 
-			img.Set(i, ny-j, color.RGBA{ir, ig, ib, 255})
+	for result := range results {
+		for i, rgba := range result.data {
+			img.Set(i, ny-result.row, rgba)
 		}
 	}
-	file, err := os.Create("demo.png")
-	must(err)
-	must(png.Encode(file, img))
 
-	duration := time.Now().Sub(start)
-	fmt.Printf("Rendering took %10.4gs\n", duration.Seconds())
+	//for i, rgba := range row {
+	//	img.Set(i, ny-j, rgba)
+	//}
+
+	return img
 }
 
 func pixel(w World, r Ray, depth int) Vector {
