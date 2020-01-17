@@ -18,7 +18,7 @@ hcloud server list
 # ccx41 -> 16 cores     0.286 EUR/h
 # ccx51 -> 32 cores     0.571 EUR/h
 
-hcloud server create --image ubuntu-18.04 --name raytracer --type ccx51 --ssh-key m
+hcloud server create --image ubuntu-18.04 --name raytracer --type ccx41 --ssh-key m
 
 
 env GOOS=linux GOARCH=amd64 go build
@@ -29,11 +29,18 @@ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$(hcloud se
 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$(hcloud server list|grep raytracer|cut -b37-50):demo.png demo-$(date +%s).png 
 hcloud server delete raytracer
 
+## Parallelization support
+
+The program is optimized for multicore machines, albeit we have a strange performance regression, i.e. larger machines with, e.g. 16 or 32 CPUs not all cores are fully utlilized -- which is rather strange given our parallelization approach of computing rows of the image in parallel. 
+
+!(parllel-2.png)
+!(parllel-1.png)
 
 ## Open topics
 
 [ ] Cleanup and refactor code
+[ ] Improve parallel performance / fix regression
 [ ] Add scene description format
 [ ] Add CLI options
 [ ] Add support for triangles 
-[ ] Allow import (and raytracing) of arbitrary models
+[ ] Allow import (and raytracing) of arbitrary models based on triangles

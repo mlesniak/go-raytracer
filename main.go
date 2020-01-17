@@ -18,7 +18,7 @@ func main() {
 	nx := 960
 	ny := 600
 	ns := 100
-	cores := 32
+	cores := 16
 	step := 1
 
 	rand.Seed(time.Now().UnixNano())
