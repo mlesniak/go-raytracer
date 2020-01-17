@@ -10,9 +10,9 @@ Using a bit of [Imagemagick](https://imagemagick.org/index.php)'s magic, we are 
 
 ![](animation.gif)
 
-## Parallelization support
+## Concurrency support
 
-The program is optimized for multicore machines, albeit we have a strange performance regression, i.e. larger machines with, e.g. 16 or 32 CPUs not all cores are fully utlilized -- which is rather strange given our parallelization approach of computing rows of the image in parallel. 
+The program is optimized for multicore machines, albeit we have a strange performance regression, i.e. larger machines with, e.g. 16 or 32 CPUs not all cores are fully utlilized -- which is rather strange given our  approach of computing rows of the image concurrently.
 
 ![](parallel-2.png)
 ![](parallel-1.png)
@@ -20,7 +20,7 @@ The program is optimized for multicore machines, albeit we have a strange perfor
 ## Open topics
 
 - [ ] **Cleanup and refactor code**
-- [ ] Improve parallel performance / fix regression
+- [ ] Improve (parallel) performance / fix regression
 - [ ] Add scene description format
 - [ ] Add CLI options
 - [ ] Add support for triangles 
