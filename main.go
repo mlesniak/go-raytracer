@@ -12,6 +12,8 @@ import (
 )
 
 func main() {
+	start := time.Now()
+
 	nx := 200
 	ny := 100
 	ns := 100
@@ -23,18 +25,6 @@ func main() {
 	world.Add(Sphere{
 		Vector{0, -1000.0, 0}, 1000,
 		Lambertian{Albedo: Vector{0.1, 0.1, 0.1}}})
-	//world.Add(Sphere{
-	//	Vector{0, 0, -1}, 0.5,
-	//	Lambertian{Albedo: Vector{0.1, 0.2, 0.5}}})
-	//world.Add(Sphere{
-	//	Vector{1, 0, -1}, 0.5,
-	//	Metal{Albedo: Vector{0.8, 0.6, 0.2}, Fuzziness: 0.5}})
-	//world.Add(Sphere{
-	//	Vector{-1, 0, -1}, 0.5,
-	//	Dielectric{1.5}})
-	//world.Add(Sphere{
-	//	Vector{-1, 0, -1}, -0.45,
-	//	Dielectric{1.5}})
 
 	for a := -11; a < 11; a++ {
 		for b := -11; b < 11; b++ {
@@ -48,7 +38,7 @@ func main() {
 							rand.Float64() * rand.Float64(),
 							rand.Float64() * rand.Float64(),
 						}}})
-			} else if mat < 0.99 {
+			} else if mat < 0.90 {
 				world.Add(Sphere{center, 0.2,
 					Metal{
 						Albedo: Vector{
@@ -66,8 +56,8 @@ func main() {
 
 	fmt.Printf("Computing %d pixel with aliasing=%d; == %dM pixels / %d objects\n", (nx*ny)/step, ns, (nx*ny)/step*ns/1_000_000, len(world.Objects))
 
-	lookFrom := Vector{3, 1, 2}
-	lookAt := Vector{0, 0, -1}
+	lookFrom := Vector{3, 0.5, 2}
+	lookAt := Vector{0, 0.5, -1}
 	distToFocus := lookFrom.Sub(lookAt).Len()
 	aperture := 0.0
 	cam := NewCamera(
@@ -101,6 +91,9 @@ func main() {
 	file, err := os.Create("demo.png")
 	must(err)
 	must(png.Encode(file, img))
+
+	duration := time.Now().Sub(start)
+	fmt.Printf("Rendering took %gs\n", duration.Seconds())
 }
 
 func pixel(w World, r Ray, depth int) Vector {
