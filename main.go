@@ -15,10 +15,10 @@ import (
 func main() {
 	start := time.Now()
 
-	nx := 200
-	ny := 100
-	ns := 1
-	cores := -1
+	nx := 400
+	ny := 200
+	ns := 100
+	cores := 16
 	step := 1
 
 	rand.Seed(time.Now().UnixNano())
@@ -84,7 +84,7 @@ func main() {
 			aperture, distToFocus)
 
 		img := computeImage(cores, nx, ny, step, ns, cam, world)
-		file, err := os.Create(fmt.Sprintf("demo-%02d.png", i))
+		file, err := os.Create(fmt.Sprintf("demo-%04d.png", i))
 		must(err)
 		must(png.Encode(file, img))
 
