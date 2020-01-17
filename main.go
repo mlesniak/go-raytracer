@@ -15,9 +15,9 @@ import (
 func main() {
 	start := time.Now()
 
-	nx := 200
-	ny := 100
-	ns := 1
+	nx := 960
+	ny := 600
+	ns := 100
 	step := 1
 
 	rand.Seed(time.Now().UnixNano())
@@ -58,7 +58,7 @@ func main() {
 	}
 	world.Add(Sphere{Vector{-2, 1, 0}, 1.0, Dielectric{1.5}})
 	world.Add(Sphere{Vector{0.5, 1.5, 0}, 1.5, Metal{Vector{.9, .1, .1}, 0.5}})
-	world.Add(Sphere{Vector{4, 2, 0}, 2.0, Metal{Vector{.7, .6, .5}, 0.2}})
+	world.Add(Sphere{Vector{4, 2, 0}, 2.0, Metal{Vector{.7, .6, .5}, 0.1}})
 
 	fmt.Printf("Computing %d pixel with aliasing=%d; == %dM pixels / %d objects\n", (nx*ny)/step, ns, (nx*ny)/step*ns/1_000_000, len(world.Objects))
 
