@@ -15,10 +15,10 @@ import (
 func main() {
 	start := time.Now()
 
-	nx := 960
-	ny := 600
-	ns := 100
-	cores := 16
+	nx := 200
+	ny := 100
+	ns := 1
+	cores := -1
 	step := 1
 
 	rand.Seed(time.Now().UnixNano())
@@ -65,24 +65,50 @@ func main() {
 	fmt.Printf("Computing %d pixel with aliasing=%d; == %dM pixels / %d objects / cores=%d\n", (nx*ny)/step, ns, (nx*ny)/step*ns/1_000_000, len(world.Objects), cores)
 
 	lookFrom := Vector{2, 1.0, 8}
-
-	//segments := 12
-	//degreePerStep := 360.0 / float64(segments)
-
 	lookAt := Vector{0, 1, 0}
-	distToFocus := lookFrom.Sub(lookAt).Len()
-	aperture := 0.0
-	cam := NewCamera(
-		lookFrom,
-		lookAt,
-		Up(),
-		40, float64(nx)/float64(ny),
-		aperture, distToFocus)
 
-	img := computeImage(cores, nx, ny, step, ns, cam, world)
-	file, err := os.Create("demo.png")
-	must(err)
-	must(png.Encode(file, img))
+	// Animation 0000--------------------------------------------------------------------------------------------------
+	segments := 360
+	angle := 360.0 / float64(segments)
+	deg := angle
+
+	for i := 1; i <= segments; i++ {
+		fmt.Println("Rendering segment", i)
+		distToFocus := lookFrom.Sub(lookAt).Len()
+		aperture := 0.0
+		cam := NewCamera(
+			lookFrom,
+			lookAt,
+			Up(),
+			40, float64(nx)/float64(ny),
+			aperture, distToFocus)
+
+		img := computeImage(cores, nx, ny, step, ns, cam, world)
+		file, err := os.Create(fmt.Sprintf("demo-%02d.png", i))
+		must(err)
+		must(png.Encode(file, img))
+
+		rad := deg * math.Pi / 180
+
+		newX := math.Cos(rad)*(lookFrom.X()-lookAt.X()) - math.Sin(rad)*(lookFrom.Z()-lookAt.Z()) + lookAt.X()
+		newY := math.Sin(rad)*(lookFrom.X()-lookAt.X()) + math.Cos(rad)*(lookFrom.Z()-lookAt.Z()) + lookAt.Z()
+		lookFrom = Vector{newX, 1.0, newY}
+	}
+
+	// Single image --------------------------------------------------------------------------------------------------
+	//distToFocus := lookFrom.Sub(lookAt).Len()
+	//aperture := 0.0
+	//cam := NewCamera(
+	//	lookFrom,
+	//	lookAt,
+	//	Up(),
+	//	40, float64(nx)/float64(ny),
+	//	aperture, distToFocus)
+	//
+	//img := computeImage(cores, nx, ny, step, ns, cam, world)
+	//file, err := os.Create("demo.png")
+	//must(err)
+	//must(png.Encode(file, img))
 
 	duration := time.Now().Sub(start)
 	fmt.Printf("Rendering took %10.4gs\n", duration.Seconds())
