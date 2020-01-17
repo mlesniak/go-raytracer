@@ -19,9 +19,9 @@ The program is optimized for multicore machines, albeit we have a strange perfor
 
 ## Open topics
 
-[ ] **Cleanup and refactor code**
-[ ] Improve parallel performance / fix regression
-[ ] Add scene description format
-[ ] Add CLI options
-[ ] Add support for triangles 
-[ ] Allow import (and raytracing) of arbitrary models based on triangles
+- [ ] **Cleanup and refactor code**
+- [ ] Improve parallel performance / fix regression
+- [ ] Add scene description format
+- [ ] Add CLI options
+- [ ] Add support for triangles 
+- [ ] Allow import (and raytracing) of arbitrary models based on triangles
