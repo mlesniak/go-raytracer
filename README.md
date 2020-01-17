@@ -8,6 +8,8 @@ The result is this raytracer written in Go which allows to produce images such a
 
 Using a bit of [Imagemagick](https://imagemagick.org/index.php)'s magic, we are able to create animations such as 
 
+!(animation.gif)
+
 ## Parallelization support
 
 The program is optimized for multicore machines, albeit we have a strange performance regression, i.e. larger machines with, e.g. 16 or 32 CPUs not all cores are fully utlilized -- which is rather strange given our parallelization approach of computing rows of the image in parallel. 
