@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -90,27 +91,33 @@ func computeImage(nx int, ny int, step int, ns int, cam Camera, world World) *im
 	results := make(chan result, ny)
 
 	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
+	var wg sync.WaitGroup
+	wg.Add(ny)
 	for j := ny - 1; j >= 0; j -= step {
-		row := make([]color.RGBA, nx)
-		for i := 0; i < nx; i += step {
-			var col Vector
-			// Antialiasing. For each pixel, shoot <ns> random rays and average the color based on the hit.
-			for s := 0; s < ns; s++ {
-				u := (float64(i) + rand.Float64()) / float64(nx)
-				v := (float64(j) + rand.Float64()) / float64(ny)
-				r := cam.ray(u, v)
-				col = col.Add(pixel(world, r, 0))
-			}
-			col = col.Scale(1.0 / float64(ns))
-			col = Vector{math.Sqrt(col.R()), math.Sqrt(col.G()), math.Sqrt(col.B())}
+		go func(j int) {
+			row := make([]color.RGBA, nx)
+			for i := 0; i < nx; i += step {
+				var col Vector
+				// Antialiasing. For each pixel, shoot <ns> random rays and average the color based on the hit.
+				for s := 0; s < ns; s++ {
+					u := (float64(i) + rand.Float64()) / float64(nx)
+					v := (float64(j) + rand.Float64()) / float64(ny)
+					r := cam.ray(u, v)
+					col = col.Add(pixel(world, r, 0))
+				}
+				col = col.Scale(1.0 / float64(ns))
+				col = Vector{math.Sqrt(col.R()), math.Sqrt(col.G()), math.Sqrt(col.B())}
 
-			ir := uint8(255.99 * col.R())
-			ig := uint8(255.99 * col.G())
-			ib := uint8(255.99 * col.B())
-			row[i] = color.RGBA{ir, ig, ib, 255}
-		}
-		results <- result{j, row}
+				ir := uint8(255.99 * col.R())
+				ig := uint8(255.99 * col.G())
+				ib := uint8(255.99 * col.B())
+				row[i] = color.RGBA{ir, ig, ib, 255}
+			}
+			results <- result{j, row}
+			wg.Done()
+		}(j)
 	}
+	wg.Wait()
 	close(results)
 
 	for result := range results {
