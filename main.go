@@ -17,7 +17,7 @@ func main() {
 
 	nx := 960
 	ny := 600
-	ns := 100
+	ns := 1
 	step := 1
 
 	rand.Seed(time.Now().UnixNano())
@@ -30,18 +30,19 @@ func main() {
 	for a := -11; a < 11; a++ {
 		for b := -11; b < 11; b++ {
 			mat := rand.Float64()
-			center := Vector{float64(a) + 0.9*rand.Float64(), 0.2, float64(b) + 0.9*rand.Float64()}
+			radius := rand.Float64()*(0.2-0.1) + 0.1
+			center := Vector{float64(a) + 0.9*rand.Float64(), radius, float64(b) + 0.9*rand.Float64()}
 			if center.Sub(Vector{0, 1, 0}).Len() > 1.5 {
 				if mat < 0.5 {
-					world.Add(Sphere{center, 0.2,
+					world.Add(Sphere{center, radius,
 						Lambertian{
 							Albedo: Vector{
 								rand.Float64() * rand.Float64(),
 								rand.Float64() * rand.Float64(),
 								rand.Float64() * rand.Float64(),
 							}}})
-				} else if mat < 0.90 {
-					world.Add(Sphere{center, 0.2,
+				} else if mat < 0.95 {
+					world.Add(Sphere{center, radius,
 						Metal{
 							Albedo: Vector{
 								0.5 + (1.0 * rand.Float64()),
@@ -51,7 +52,7 @@ func main() {
 							Fuzziness: 0.5 * rand.Float64(),
 						}})
 				} else {
-					world.Add(Sphere{center, 0.2, Dielectric{1.5}})
+					world.Add(Sphere{center, 0.1, Dielectric{1.5}})
 				}
 			}
 		}
@@ -89,6 +90,7 @@ type result struct {
 
 func computeImage(nx int, ny int, step int, ns int, cam Camera, world World) *image.RGBA {
 	results := make(chan result, ny)
+	status := make(chan string)
 
 	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
 	var wg sync.WaitGroup
@@ -114,10 +116,17 @@ func computeImage(nx int, ny int, step int, ns int, cam Camera, world World) *im
 				row[i] = color.RGBA{ir, ig, ib, 255}
 			}
 			results <- result{j, row}
-			wg.Done()
+			status <- fmt.Sprintf("Row %d finished", j)
 		}(j)
 	}
-	wg.Wait()
+	finished := 0.0
+	for i := 0; i < ny; i++ {
+		<-status
+		finished++
+		perc := finished / float64(ny) * 100.0
+		fmt.Printf("%3.0f%%        \r", perc)
+	}
+	//wg.Wait()
 	close(results)
 
 	for result := range results {
