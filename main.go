@@ -17,7 +17,7 @@ func main() {
 
 	nx := 960
 	ny := 600
-	ns := 1
+	ns := 100
 	step := 1
 
 	rand.Seed(time.Now().UnixNano())
@@ -45,9 +45,9 @@ func main() {
 					world.Add(Sphere{center, radius,
 						Metal{
 							Albedo: Vector{
-								0.5 + (1.0 * rand.Float64()),
-								0.5 + (1.0 * rand.Float64()),
-								0.5 + (1.0 * rand.Float64()),
+								rand.Float64(),
+								rand.Float64(),
+								rand.Float64(),
 							},
 							Fuzziness: 0.5 * rand.Float64(),
 						}})
@@ -58,12 +58,15 @@ func main() {
 		}
 	}
 	world.Add(Sphere{Vector{-2, 1, 0}, 1.0, Dielectric{1.5}})
-	world.Add(Sphere{Vector{0.5, 1.5, 0}, 1.5, Metal{Vector{.9, .1, .1}, 0.5}})
-	world.Add(Sphere{Vector{4, 2, 0}, 2.0, Metal{Vector{.7, .6, .5}, 0.1}})
+	world.Add(Sphere{Vector{0.5, 1.5, 0}, 1.5, Metal{Vector{.9, .1, .1}, 0.3}})
+	world.Add(Sphere{Vector{4, 2, 0}, 2.0, Metal{Vector{.7, .6, .5}, 0.0}})
 
 	fmt.Printf("Computing %d pixel with aliasing=%d; == %dM pixels / %d objects\n", (nx*ny)/step, ns, (nx*ny)/step*ns/1_000_000, len(world.Objects))
 
 	lookFrom := Vector{2, 1.0, 8}
+	//segments := 10
+	//degreePerStep := 360.0 / float64(segments)
+
 	lookAt := Vector{0, 1, 0}
 	distToFocus := lookFrom.Sub(lookAt).Len()
 	aperture := 0.0
@@ -97,6 +100,7 @@ func computeImage(nx int, ny int, step int, ns int, cam Camera, world World) *im
 	wg.Add(ny)
 	for j := ny - 1; j >= 0; j -= step {
 		go func(j int) {
+			fmt.Println("Spawning row", j)
 			row := make([]color.RGBA, nx)
 			for i := 0; i < nx; i += step {
 				var col Vector
