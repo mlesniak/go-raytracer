@@ -18,6 +18,7 @@ func main() {
 	nx := 960
 	ny := 600
 	ns := 100
+	cores := 32
 	step := 1
 
 	rand.Seed(time.Now().UnixNano())
@@ -61,10 +62,11 @@ func main() {
 	world.Add(Sphere{Vector{0.5, 1.5, 0}, 1.5, Metal{Vector{.9, .1, .1}, 0.3}})
 	world.Add(Sphere{Vector{4, 2, 0}, 2.0, Metal{Vector{.7, .6, .5}, 0.0}})
 
-	fmt.Printf("Computing %d pixel with aliasing=%d; == %dM pixels / %d objects\n", (nx*ny)/step, ns, (nx*ny)/step*ns/1_000_000, len(world.Objects))
+	fmt.Printf("Computing %d pixel with aliasing=%d; == %dM pixels / %d objects / cores=%d\n", (nx*ny)/step, ns, (nx*ny)/step*ns/1_000_000, len(world.Objects), cores)
 
 	lookFrom := Vector{2, 1.0, 8}
-	//segments := 10
+
+	//segments := 12
 	//degreePerStep := 360.0 / float64(segments)
 
 	lookAt := Vector{0, 1, 0}
@@ -77,7 +79,7 @@ func main() {
 		40, float64(nx)/float64(ny),
 		aperture, distToFocus)
 
-	img := computeImage(nx, ny, step, ns, cam, world)
+	img := computeImage(cores, nx, ny, step, ns, cam, world)
 	file, err := os.Create("demo.png")
 	must(err)
 	must(png.Encode(file, img))
@@ -91,16 +93,25 @@ type result struct {
 	data []color.RGBA
 }
 
-func computeImage(nx int, ny int, step int, ns int, cam Camera, world World) *image.RGBA {
+func computeImage(cores int, nx int, ny int, step int, ns int, cam Camera, world World) *image.RGBA {
 	results := make(chan result, ny)
 	status := make(chan string)
+
+	var sem Semaphore
+	if cores <= 0 {
+		sem = NewSemaphore(ny)
+	} else {
+		sem = NewSemaphore(cores)
+	}
 
 	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
 	var wg sync.WaitGroup
 	wg.Add(ny)
 	for j := ny - 1; j >= 0; j -= step {
 		go func(j int) {
-			fmt.Println("Spawning row", j)
+			sem.Acquire(1)
+			defer sem.Release(1)
+			//fmt.Println("Spawning row", j)
 			row := make([]color.RGBA, nx)
 			for i := 0; i < nx; i += step {
 				var col Vector
@@ -138,10 +149,6 @@ func computeImage(nx int, ny int, step int, ns int, cam Camera, world World) *im
 			img.Set(i, ny-result.row, rgba)
 		}
 	}
-
-	//for i, rgba := range row {
-	//	img.Set(i, ny-j, rgba)
-	//}
 
 	return img
 }
