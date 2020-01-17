@@ -35,7 +35,7 @@ This script contains shell commands to spawn and delete [Hetzner cloud](https://
     scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$(hcloud server list|grep raytracer|cut -b37-50):demo.zip demo.zip
     
     unzip demo.zip
-    ./create-animations.sh
+    ./create-animation.sh
     
 ## Delete server    
      
