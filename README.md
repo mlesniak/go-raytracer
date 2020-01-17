@@ -6,7 +6,7 @@ The result is this raytracer written in Go which allows to produce images (which
 
 !(full.png)
 
-Using a bit of [Imagemagick](https://imagemagick.org/index.php)'s magic, we are able to create animations (computation time ca. XX minutes with 16 cores) such as 
+Using a bit of [Imagemagick](https://imagemagick.org/index.php)'s magic, we are able to create animations (computation time ca. 23 minutes with 16 cores) such as 
 
 !(animation.gif)
 
