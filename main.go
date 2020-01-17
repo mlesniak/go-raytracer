@@ -16,7 +16,7 @@ func main() {
 
 	nx := 200
 	ny := 100
-	ns := 100
+	ns := 10
 	step := 1
 
 	rand.Seed(time.Now().UnixNano())
@@ -30,34 +30,39 @@ func main() {
 		for b := -11; b < 11; b++ {
 			mat := rand.Float64()
 			center := Vector{float64(a) + 0.9*rand.Float64(), 0.2, float64(b) + 0.9*rand.Float64()}
-			if mat < 0.5 {
-				world.Add(Sphere{center, 0.2,
-					Lambertian{
-						Albedo: Vector{
-							rand.Float64() * rand.Float64(),
-							rand.Float64() * rand.Float64(),
-							rand.Float64() * rand.Float64(),
-						}}})
-			} else if mat < 0.90 {
-				world.Add(Sphere{center, 0.2,
-					Metal{
-						Albedo: Vector{
-							0.5 + (1.0 * rand.Float64()),
-							0.5 + (1.0 * rand.Float64()),
-							0.5 + (1.0 * rand.Float64()),
-						},
-						Fuzziness: 0.5 * rand.Float64(),
-					}})
-			} else {
-				world.Add(Sphere{center, 0.2, Dielectric{1.5}})
+			if center.Sub(Vector{0, 1, 0}).Len() > 1.5 {
+				if mat < 0.5 {
+					world.Add(Sphere{center, 0.2,
+						Lambertian{
+							Albedo: Vector{
+								rand.Float64() * rand.Float64(),
+								rand.Float64() * rand.Float64(),
+								rand.Float64() * rand.Float64(),
+							}}})
+				} else if mat < 0.90 {
+					world.Add(Sphere{center, 0.2,
+						Metal{
+							Albedo: Vector{
+								0.5 + (1.0 * rand.Float64()),
+								0.5 + (1.0 * rand.Float64()),
+								0.5 + (1.0 * rand.Float64()),
+							},
+							Fuzziness: 0.5 * rand.Float64(),
+						}})
+				} else {
+					world.Add(Sphere{center, 0.2, Dielectric{1.5}})
+				}
 			}
 		}
 	}
+	world.Add(Sphere{Vector{-2, 1, 0}, 1.0, Dielectric{1.5}})
+	world.Add(Sphere{Vector{0.5, 1.5, 0}, 1.5, Metal{Vector{.9, .1, .1}, 0.5}})
+	world.Add(Sphere{Vector{4, 2, 0}, 2.0, Metal{Vector{.7, .6, .5}, 0.2}})
 
 	fmt.Printf("Computing %d pixel with aliasing=%d; == %dM pixels / %d objects\n", (nx*ny)/step, ns, (nx*ny)/step*ns/1_000_000, len(world.Objects))
 
-	lookFrom := Vector{3, 0.5, 2}
-	lookAt := Vector{0, 0.5, -1}
+	lookFrom := Vector{2, 1.0, 8}
+	lookAt := Vector{0, 1, 0}
 	distToFocus := lookFrom.Sub(lookAt).Len()
 	aperture := 0.0
 	cam := NewCamera(
@@ -69,6 +74,7 @@ func main() {
 
 	img := image.NewRGBA(image.Rect(0, 0, nx, ny))
 	for j := ny - 1; j >= 0; j -= step {
+		//row := make([]color.RGBA, nx)
 		for i := 0; i < nx; i += step {
 			var col Vector
 			// Antialiasing. For each pixel, shoot <ns> random rays and average the color based on the hit.
@@ -93,7 +99,7 @@ func main() {
 	must(png.Encode(file, img))
 
 	duration := time.Now().Sub(start)
-	fmt.Printf("Rendering took %gs\n", duration.Seconds())
+	fmt.Printf("Rendering took %10.4gs\n", duration.Seconds())
 }
 
 func pixel(w World, r Ray, depth int) Vector {
