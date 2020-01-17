@@ -26,11 +26,16 @@ This script contains shell commands to spawn and delete [Hetzner cloud](https://
 
     ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$(hcloud server list|grep raytracer|cut -b37-51)
     ./raytracer
+    apt install -y zip
+    zip demo.zip demo-*.png
     
 ## Copy files to local machine
 
-
-    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$(hcloud server list|grep raytracer|cut -b37-50):demo.png demo-$(date +%s).png
+    # scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$(hcloud server list|grep raytracer|cut -b37-50):demo.png demo-$(date +%s).png
+    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$(hcloud server list|grep raytracer|cut -b37-50):demo.zip demo.zip
+    
+    unzip demo.zip
+    ./create-animations.sh
     
 ## Delete server    
      
