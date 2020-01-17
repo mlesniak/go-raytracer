@@ -68,7 +68,7 @@ func main() {
 	lookAt := Vector{0, 1, 0}
 
 	// Animation 0000--------------------------------------------------------------------------------------------------
-	segments := 360
+	segments := 36
 	angle := 360.0 / float64(segments)
 	deg := angle
 
